@@ -1,0 +1,26 @@
+{
+  "name": "381fgpproject",
+  "version": "1.0.0",
+  "description": "gp project",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kamil1027/13322849-381F-gpproject.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kamil1027/13322849-381F-gpproject/issues"
+  },
+  "homepage": "https://github.com/kamil1027/13322849-381F-gpproject#readme",
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "express.js": "^1.0.0",
+    "mongoose": "^7.6.3"
+  },
+  "devDependencies": {}
+}
