@@ -18,9 +18,13 @@
   },
   "homepage": "https://github.com/kamil1027/13322849-381F-gpproject#readme",
   "dependencies": {
+    "body-parse": "^0.1.0",
+    "cookie-session": "^2.0.0",
     "ejs": "^3.1.9",
     "express.js": "^1.0.0",
     "mongoose": "^7.6.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
 }
