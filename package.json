@@ -21,6 +21,7 @@
     "body-parse": "^0.1.0",
     "cookie-session": "^2.0.0",
     "ejs": "^3.1.9",
+    "express-session": "^1.17.3",
     "express.js": "^1.0.0",
     "mongoose": "^7.6.3"
   },
