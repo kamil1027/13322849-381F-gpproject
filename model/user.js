@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var fs = require('fs')
 var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
@@ -21,16 +22,20 @@ var userSchema = new Schema({
     area: {
         type: String
     },
-    sessionKey: {
-        type: String
-    },
     createdAt: {
         type: Date,
         default: Date.now
       },
-    updatedAt: {
-        type: Date,
-    }
+      icon: {
+        data: {
+          type: Buffer,
+          default: fs.readFileSync('./public/db/user.png')
+        },
+        contentType: {
+          type: String,
+          default: 'image/png'
+        }
+      }
 });
 
 module.exports = mongoose.model('User', userSchema, 'User');

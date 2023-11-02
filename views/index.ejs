@@ -132,10 +132,24 @@
           </li>
         </ul>
 
-        <div class="dropdown text-end">
-          <a class="btn btn-light" href="/login">Login</a>
-          <a class="btn btn-light" href="/signup">Sign up</a>
-        </div>
+        <% if (username && base64icon) { %>
+          <div class="dropdown text-end">
+            <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="data:image/png;base64,<%= base64icon %>" alt="<%= username %>" width="32" height="32" class="rounded-circle">
+              <%=username %>
+            </a>
+            <ul class="dropdown-menu text-small">
+              <li><a class="dropdown-item" href="/profile">Profile</a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item" href="/signout">Sign out</a></li>
+            </ul>
+          </div>
+        <% } else { %>
+          <div class="dropdown text-end">
+            <a class="btn btn-light" href="/login">Login</a>
+            <a class="btn btn-light" href="/signup">Sign up</a>
+          </div>
+        <% } %>
       </div>
     </div>
   </header>
