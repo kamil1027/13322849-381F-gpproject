@@ -1,0 +1,30 @@
+.close-btn {
+   
+    color: #444;
+             cursor: pointer;
+             left: 80%;
+             height: 68px;
+             width: 25px;
+             right: 10px;
+             top: 30px;
+              position: absolute;
+             transition: 250ms ease;
+ 
+             &:before,
+             &:after {
+                 content: "";
+                 height: 2px;
+                 background: #444;
+                 width: 100%;
+                 top: 50%;
+                 left: 5%;
+                 position: absolute;
+                 transition: 250ms ease;
+             }
+             &:before {
+                 transform: rotate(-45deg);
+             }
+             &:after {
+                 transform: rotate(45deg);
+             }
+ }
