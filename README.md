@@ -66,6 +66,32 @@ Pre-loading req.session.cart and total price of each req.session.cart.price, sin
 Cart ["string", "string", "string"...]
 
 ********************************************
+# Session
+1. req.session.username
+Used for login, sign in / out, create order with non-login users
+
+2. req.session.cart
+Used for storing the cart item for create order flow
+
+- Clear cart (/clear_cart)
+If cart is not null {
+	req.session.cart = null
+}
+else {
+	pass
+}
+
+- totalPrice
+Adding all of the cart.price which is a array
+Cart [
+	"name": dummy
+	"inventory": 1
+	"like" :1
+	"price": 1
+	]
+Adding all cart.price together in middleware
+
+********************************************
 # Login
 
 **Login flow**
@@ -93,7 +119,7 @@ password: 123
 ********************************************
 # Logout
 In the home page, each user can log out their account by clicking Sign out.
-It would clear the session (req.session.username) to null
+It would clear the session.
 
 ********************************************
 # Create
