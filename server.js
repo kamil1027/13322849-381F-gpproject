@@ -251,6 +251,7 @@ app.get("/product/:id", (req, res) => {
                     comment_username: comment.username,
                     comment: comment.comment,
                     comment_date: comment.createdAt,
+                    comment_id: comment._id
                   }));
                   res.render("info", {
                     username,
@@ -295,6 +296,7 @@ app.get("/product/:id", (req, res) => {
                     comment_username: comment.username,
                     comment: comment.comment,
                     comment_date: comment.createdAt,
+                    comment_id: comment._id,
                   }));
                   res.render("info", {
                     username,

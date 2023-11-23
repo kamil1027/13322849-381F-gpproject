@@ -273,7 +273,7 @@ else{
 Two update flow are here
 
 - Upload Icon flow
---> Choosing a Image file (PNG / JPG) and click upload
+--> Choosing a Image file (PNG) and click upload
 --> Server would trafer the image file to Base64
 --> Update icon field from the user collection of mongodb base on username (req.session.username)
 
