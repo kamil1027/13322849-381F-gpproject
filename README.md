@@ -4,7 +4,10 @@ Group: 86
 Name: 
 Hung Kam Fung (13322849)
 
+Github link: https://github.com/kamil1027/13322849-381F-gpproject
 Application link: https://three81f-gp.onrender.com
+
+Better use github for reading read.me
 
 ********************************************
 # Mongo collection
@@ -66,6 +69,32 @@ Pre-loading req.session.cart and total price of each req.session.cart.price, sin
 Cart ["string", "string", "string"...]
 
 ********************************************
+# Session
+1. req.session.username
+Used for login, sign in / out, create order with non-login users
+
+2. req.session.cart
+Used for storing the cart item for create order flow
+
+- Clear cart (/clear_cart)
+If cart is not null {
+	req.session.cart = null
+}
+else {
+	pass
+}
+
+- totalPrice
+Adding all of the cart.price which is a array
+Cart [
+	"name": dummy
+	"inventory": 1
+	"like" :1
+	"price": 1
+	]
+Adding all cart.price together in middleware
+
+********************************************
 # Login
 
 **Login flow**
@@ -93,11 +122,10 @@ password: 123
 ********************************************
 # Logout
 In the home page, each user can log out their account by clicking Sign out.
-It would clear the session (req.session.username) to null
+It would clear the session.
 
 ********************************************
-# CRUD service
-- Create
+# Create
 In the shop, there are three create flow which are
 - create-order-flow
 - Signup flow
@@ -193,7 +221,7 @@ Create order {
 Should see the comment data
 
 ********************************************
-# CRUD service
+# Read
 
 **Product page**
 Product page has two page which read data from Mongodb with following data
@@ -265,7 +293,7 @@ else{
 - Show the below data in profile page
 
 ********************************************
-# CRUD service
+# Update
 
 **Profile Page**
 1. Login
@@ -280,10 +308,11 @@ Two update flow are here
 update profile flow
 --> Click update
 --> redirect to the updateprofile page (Same as the signup page UI)
--->Update all data unless icon from the user collection of mongodb base on username (req.session.username)
+--> Update all data unless icon from the user collection of mongodb base on username (req.session.username)
+--> Update all order history data to new username base on prvious name (replacing to new name to each history data from history collection of mongodb)
 
 ********************************************
-# CRUD service
+# Delete
 Two delete flow would use in two pages which are
 - Profile page
 - Product-Info page

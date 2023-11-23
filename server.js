@@ -655,29 +655,31 @@ app.post("/api/updateprofile", (req, res) => {
     User.findOne({ username: loggedInUsername })
       .then((user) => {
         if (user) {
-          // Update the user record with the form data
           user.username = req.body.username;
           user.password = req.body.password;
           user.age = req.body.age;
           user.area = req.body.area;
           user.email = req.body.email;
           user.phone = req.body.phone;
-
           user.save()
-            .then(() => {
-              res.redirect('/profile');
-            })
-            .catch((error) => {
-              res.redirect('/profile');
-            });
         } else {
-          res.redirect('/error');
+          res.redirect('/');
         }
       })
       .catch((error) => {
-        res.redirect('/error');
+        res.redirect('/');
       });
-  } else {
+      
+      History.updateMany({ username: loggedInUsername }, { username: req.body.username })
+      .then((result) => {
+        res.redirect('/profile');
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
+      });
+
+  } else {``
     res.redirect('/');
   }
 });
