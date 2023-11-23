@@ -4,6 +4,7 @@ const session = require("express-session");
 const User = require("./model/user");
 const Product = require("./model/product");
 const History = require("./model/history");
+const Comment = require("./model/comment");
 const multer = require("multer");
 const randomstring = require("randomstring");
 const app = express();
@@ -90,6 +91,10 @@ function getProductById(productId) {
   return Product.findById(productId).exec();
 }
 
+function getCommentsByProduct(commetId) {
+  return Comment.findById(commetId).exec();
+}
+
 //Test DB connection
 var db = mongoose.connection;
 db.on("open", function () {
@@ -100,6 +105,7 @@ db.on("error", function () {
   console.log("MongoDB Connection Error");
 });
 
+//index page, UI function
 app.get("/", (req, res) => {
   if (req.user && req.user.username && req.user.base64icon) {
     const username = req.user.username;
@@ -112,11 +118,18 @@ app.get("/", (req, res) => {
   }
 });
 
+//product page
 app.get("/product", (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = 12;
+
   if (req.user && req.user.username && req.user.base64icon) {
     const username = req.user.username;
     const base64icon = req.user.base64icon;
+
     Product.find()
+      .skip((page - 1) * limit)
+      .limit(limit)
       .then((products) => {
         if (products.length > 0) {
           const productData = products.map((product) => ({
@@ -128,11 +141,22 @@ app.get("/product", (req, res) => {
             like: product.like,
             image: product.image,
           }));
-          res.render("product", {
-            products: productData,
-            username,
-            base64icon,
-            query: req.query,
+
+          Product.countDocuments()
+          .then((count) => {
+            const totalPages = Math.ceil(count / limit);
+            res.render("product", {
+              products: productData,
+              username,
+              base64icon,
+              query: req.query,
+              currentPage: page,
+              totalPages: totalPages,
+            });
+          })
+          .catch((err) => {
+            console.error(err);
+            res.status(500).send("Internal Server Error");
           });
         } else {
           console.log("No products found");
@@ -141,6 +165,8 @@ app.get("/product", (req, res) => {
             username,
             base64icon,
             query: req.query,
+            currentPage: page,
+            totalPages: 1,
           });
         }
       })
@@ -153,6 +179,8 @@ app.get("/product", (req, res) => {
     const base64icon = null;
 
     Product.find()
+      .skip((page - 1) * limit)
+      .limit(limit)
       .then((products) => {
         if (products.length > 0) {
           const productData = products.map((product) => ({
@@ -164,11 +192,22 @@ app.get("/product", (req, res) => {
             like: product.like,
             image: product.image,
           }));
-          res.render("product", {
-            products: productData,
-            username,
-            base64icon,
-            query: req.query,
+
+          Product.countDocuments()
+          .then((count) => {
+            const totalPages = Math.ceil(count / limit);
+            res.render("product", {
+              products: productData,
+              username,
+              base64icon,
+              query: req.query,
+              currentPage: page,
+              totalPages: totalPages,
+            });
+          })
+          .catch((err) => {
+            console.error(err);
+            res.status(500).send("Internal Server Error");
           });
         } else {
           console.log("No products found");
@@ -177,6 +216,8 @@ app.get("/product", (req, res) => {
             username,
             base64icon,
             query: req.query,
+            currentPage: page,
+            totalPages: 1,
           });
         }
       })
@@ -187,26 +228,55 @@ app.get("/product", (req, res) => {
   }
 });
 
+//product info + comment + pagination page UI function
 app.get("/product/:id", (req, res) => {
   const productId = req.params.id;
+  const page = parseInt(req.query.page) || 1; // Current page number
+  const limit = 5; // Number of comments per page
 
   if (req.user && req.user.username && req.user.base64icon) {
     const username = req.user.username;
     const base64icon = req.user.base64icon;
-
-    // Assuming you have a function to retrieve product information by ID
     getProductById(productId)
       .then((product) => {
         if (product) {
-          res.render("info", { username, base64icon, product });
+          Comment.find({ product: productId })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .then((comments) => {
+              Comment.countDocuments({ product: productId })
+                .then((totalComments) => {
+                  const totalPages = Math.ceil(totalComments / limit);
+                  const commentData = comments.map((comment) => ({
+                    comment_username: comment.username,
+                    comment: comment.comment,
+                    comment_date: comment.createdAt,
+                  }));
+                  res.render("info", {
+                    username,
+                    base64icon,
+                    product,
+                    comments: commentData,
+                    totalPages,
+                    currentPage: page,
+                  });
+                })
+                .catch((error) => {
+                  console.error(error);
+                  res.status(500).json({ success: false, message: "Internal Server Error" });
+                });
+            })
+            .catch((error) => {
+              console.error(error);
+              res.status(500).json({ success: false, message: "Internal Server Error" });
+            });
         } else {
-          console.log("Product not found");
-          res.render("info", { username, base64icon, product: null });
+          res.status(404).json({ success: false, message: "Product not found" });
         }
       })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).send("Internal Server Error");
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
       });
   } else {
     const username = null;
@@ -214,19 +284,83 @@ app.get("/product/:id", (req, res) => {
     getProductById(productId)
       .then((product) => {
         if (product) {
-          res.render("info", { username, base64icon, product });
+          Comment.find({ product: productId })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .then((comments) => {
+              Comment.countDocuments({ product: productId })
+                .then((totalComments) => {
+                  const totalPages = Math.ceil(totalComments / limit);
+                  const commentData = comments.map((comment) => ({
+                    comment_username: comment.username,
+                    comment: comment.comment,
+                    comment_date: comment.createdAt,
+                  }));
+                  res.render("info", {
+                    username,
+                    base64icon,
+                    product,
+                    comments: commentData,
+                    totalPages,
+                    currentPage: page,
+                  });
+                })
+                .catch((error) => {
+                  console.error(error);
+                  res.status(500).json({ success: false, message: "Internal Server Error" });
+                });
+            })
+            .catch((error) => {
+              console.error(error);
+              res.status(500).json({ success: false, message: "Internal Server Error" });
+            });
         } else {
-          console.log("Product not found");
-          res.render("info", { username, base64icon, product: null });
+          res.status(404).json({ success: false, message: "Product not found" });
         }
       })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).send("Internal Server Error");
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
       });
   }
 });
 
+//product info + comment page, comment function
+app.post("/api/comment", (req, res) => {
+  const productId = req.body.productId;
+  const username = req.session.username;
+  const commentText = req.body.comment;
+
+  Comment.create({
+    product: productId,
+    username: username,
+    comment: commentText,
+  })
+    .then((comment) => {
+      res.redirect("back");
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
+    });
+});
+
+//product info + comment page, delete comment function
+app.post("/api/comment/delete", (req, res) => {
+  const commentId = req.body.commentId;
+
+  Comment.findByIdAndDelete(commentId)
+    .then(() => {
+      console.log(commentId + ", deleted")
+      res.redirect("back");
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
+    });
+});
+
+//Cart-checkout
 app.get("/checkout", (req, res) => {
   if (req.user && req.user.username && req.user.base64icon) {
     const username = req.user.username;
@@ -247,6 +381,7 @@ app.get("/checkout", (req, res) => {
   }
 });
 
+//Cart-additem
 app.post("/add_cart/:pid", (req, res) => {
   const productId = req.params.pid;
 
@@ -272,15 +407,17 @@ app.post("/add_cart/:pid", (req, res) => {
     });
 });
 
+//cart-clear
 app.post("/clear_cart", (req, res) => {
   if (req.session.cart) {
     req.session.cart = null;
-    res.redirect("/product");
+    res.redirect("/back");
   } else {
-    res.redirect("/product");
+    res.redirect("/back");
   }
 });
 
+//create-order-flow-paymentpage UI function
 app.get("/payment", (req, res) => {
   if (req.user && req.user.username && req.user.base64icon) {
     const username = req.user.username;
@@ -301,6 +438,7 @@ app.get("/payment", (req, res) => {
   }
 });
 
+//create-order-flow-create-order
 app.post("/create_order", async (req, res) => {
   if (req.session.cart) {
     if (req.user && req.user.username && req.user.base64icon) {
@@ -325,7 +463,7 @@ app.post("/create_order", async (req, res) => {
             minute: '2-digit',
             second: '2-digit'
           });
-        req.session.cart==null;
+          req.session.cart = null;
         res.render("complete_order", { username, base64icon, historydata, date: formattedDate, postdata});
       } catch (error) {
         console.error("Error:", error);
@@ -481,7 +619,7 @@ app.get("/profile", (req, res) => {
     res.redirect("/");
   }
 });
-
+//Profile-page, delete order
 app.post('/delete_order/:id', (req, res) => {
   const orderId = req.params.id; // Access the order ID from the route parameter
 
@@ -496,6 +634,7 @@ app.post('/delete_order/:id', (req, res) => {
     });
 });
 
+//Profile-update-profile-page, UI function
 app.get("/updateprofile", (req,res) => {
   if (req.user && req.user.username && req.user.base64icon) {
     const usernameExists = req.query.usernameExists === "true";
@@ -506,6 +645,7 @@ app.get("/updateprofile", (req,res) => {
   }
 })
 
+//Profile-update profile flow
 app.post("/api/updateprofile", (req, res) => {
   if (req.user && req.user.username && req.user.base64icon) {
     const loggedInUsername = req.user.username;
@@ -523,10 +663,10 @@ app.post("/api/updateprofile", (req, res) => {
 
           user.save()
             .then(() => {
-              res.redirect('/');
+              res.redirect('/profile');
             })
             .catch((error) => {
-              res.redirect('/');
+              res.redirect('/profile');
             });
         } else {
           res.redirect('/error');
@@ -540,6 +680,7 @@ app.post("/api/updateprofile", (req, res) => {
   }
 });
 
+//Profile-upload Icon flow
 app.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) {
     res.status(400).send("No file uploaded");
@@ -570,12 +711,13 @@ app.post("/upload", upload.single("image"), (req, res) => {
     });
 });
 
-//Login function & signin & signout
+//Login-page, UI function
 app.get("/login", (req, res) => {
   const loginFailed = req.query.loginFailed === "true";
   res.render("login", { loginFailed });
 });
 
+//Login-page, login flow
 app.post("/login", function (req, res, next) {
   var postData = {
     username: req.body.username,
@@ -600,11 +742,13 @@ app.post("/login", function (req, res, next) {
     });
 });
 
+//Signup-page, UI function
 app.get("/signup", (req, res) => {
   const usernameExists = req.query.usernameExists === "true";
   res.render("signup", { usernameExists });
 });
 
+//Signup-page, signup flow
 app.post("/signup", function (req, res) {
   var postData = {
     username: req.body.username,
@@ -626,7 +770,7 @@ app.post("/signup", function (req, res) {
           .then((data) => {
             console.log("Sign up Success");
             req.session.username = postData.username;
-            res.render("index-auth", req.query);
+            res.redirect("/");
           })
           .catch((err) => {
             throw err;
@@ -637,13 +781,14 @@ app.post("/signup", function (req, res) {
       throw err;
     });
 });
-
+//signout function
 app.get("/signout", (req, res) => {
   req.session.destroy();
   res.clearCookie("session");
   res.redirect("/");
 });
 
+//if enter other website which not defined, auto redirect index or /
 app.get("*", (req, res) => {
   res.redirect("/");
 });

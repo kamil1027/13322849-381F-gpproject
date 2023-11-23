@@ -1,5 +1,5 @@
 <head>
-  <title>Info</title>
+  <title><%= product.name %></title>
   <meta charset="UTF-8"/>
   <link rel="stylesheet" href="/cart.css">
   <link rel="stylesheet" href="/cart.scss">
@@ -16,6 +16,9 @@
     crossorigin="anonymous"
   ></script>
   <style>
+    .page-number {
+  margin: 0 5px; /* Adjust the spacing as desired */
+}
     .img-fluid {
     max-width: 100%;
     height: auto;
@@ -194,7 +197,7 @@
                 <div class="container">
                   <div class="row">
                     <div class="col">
-                      <form action="/clear_cart" method="POST">
+                      <form action="/clea r_cart" method="POST">
                         <button type="submit" class="btn btn-primary">clear cart</button>
                       </form>
                     </div>
@@ -222,12 +225,12 @@
     </div>
   </header>
     <body>
-            <div class="container"> 
+            <div class="d-flex p-2 justify-content-center"> 
                   <% if (product.inventory > 0) { %>
                     <div class="row">  
                       <div class="col-8">
-                        <img src="<%= product.image %>" alt="Product Image" class="img-thumbnail">
-                      </div>
+                        <img src="<%= product.image %>" alt="Product Image" class="img-thumbnail" width="750" height="750">
+                      </div> 
                       <div class="col-4">
                         <h5 class="item-name"><%= product.name %></h5>
                       <p class="item-price">Price: $<%= product.price %></p>
@@ -236,6 +239,84 @@
                   <% } else { %>
                     <p class="out-of-stock">Out of Stock</p>
                   <% } %>
+                </div>
+              </div>
+            </div>
+            <div class="app container py-5">
+              <div class="col-md-10 col-lg-8 m-auto">
+                <p class="lead mb-3">Comment</p>
+                <hr>
+                <div class="pt-1 mb-5">
+                  <div class="vstack gap-4" style="--sk-icon-btn-size:1.25em;--sk-icon-btn-padding:.25rem;">
+                    <div class="comment-box">
+                      <div class="d-flex comment">
+                        <% if (username && base64icon) { %>
+                          <img src="data:image/png;base64,<%= base64icon %>" alt="<%= username %>" width="32" height="32" class="rounded-circle">
+                          <%= username %>  
+                          <div class="flex-grow-1 ms-3">
+                            <form action="/api/comment" method="POST">
+                              <div class="form-floating comment-compose mb-2">
+                                <textarea class="form-control w-100" placeholder="Leave a comment here" id="my-comment-reply" style="height:2rem;" name="comment" id="comment" value="comment"></textarea>
+                                <label for="my-comment-reply">Leave a comment here</label>
+                              </div>
+                              <div class="hstack justify-content-end gap-1">
+                                <input type="hidden" name="productId" value="<%= product._id.toString() %>">
+                                <button type="submit" class="btn btn-sm btn-primary rounded-pill small" value="<%= product._id %>">Post NOW</button>
+                              </div>
+                            </form>
+                          </div>
+                        <% } else { %>  
+                          If you would like to comment here, Please login first.
+                        <% } %>
+                      </div>
+                    </div>
+                    <% if (comments.length > 0) { %>
+                      <% comments.forEach((comment) => { %>
+                        <div class="comment-box">
+                          <div class="d-flex comment">
+                            <!-- <img src="data:image/png;base64," alt="<%= comment.comment_username %>" width="32" height="32" class="rounded-circle"> -->
+                            <div class="flex-grow-1 ms-3">
+                              <div class="mb-1">
+                                <a href="#" class="fw-bold link-body-emphasis me-1"><%= comment.comment_username %>,</a>
+                                <i class="zmdi zmdi-check me-1 fw-bold" title="verified"></i>
+                                <span class="text-body-secondary text-nowrap"><%= comment.comment_date %></span>
+                              </div>
+                              <hr>
+                              <div class="mb-1"><%= comment.comment %></div>
+                              <div class="hstack align-items-center mb-0" style="margin-left:-.25rem;">
+                                <form action="/api/comment/delete" method="POST" onsubmit="deleteComment('<%= comment._id %>'); return false;">
+                                  <input type="hidden" name="commentId" value="<%= comment.comment_id %>">
+                                  <button class="btn btn-sm btn-danger rounded-pill small">Delete</button>
+                                </form>
+                              </div>
+                              <hr>
+                            </div>
+                          </div>
+                        </div>
+                      <% }) %>
+                      <% if (totalPages > 1) { %>
+                        <div class="d-flex p-2 align-items-center">
+                          <% if (currentPage > 1) { %>
+                            <a href="/product/<%= product._id %>?page=<%= currentPage - 1 %>" class="btn btn-sm btn-primary rounded-pill">Previous</a>
+                          <% } %>
+                          
+                          <% for (let i = 1; i <= totalPages; i++) { %>
+                            <% if (i === currentPage) { %>
+                              <span class="current-page"><%= i %></span>
+                            <% } else { %>
+                              <a href="/product/<%= product._id %>?page=<%= i %>" class="pxage-number"><%= i %></a>
+                            <% } %>
+                          <% } %>
+                          
+                          <% if (currentPage < totalPages) { %>
+                            <a href="/product/<%= product._id %>?page=<%= currentPage + 1 %>" class="btn btn-sm btn-primary rounded-pill">Next</a>
+                          <% } %>
+                        </div>
+                      <% } %>
+                    <% } else { %>
+                      <p>No comments</p>
+                    <% } %>
+                  </div>
                 </div>
               </div>
             </div>

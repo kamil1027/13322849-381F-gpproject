@@ -233,7 +233,7 @@
                   <p class="card-text">Price: <%= product.price %></p>
                   <p class="card-text">Inventory: <%= product.inventory %></p>
                   <% const words = product.information.split(' '); %>
-                    <p class="card-text truncated-info">Information: <%= product.information %></p>
+                  <p class="card-text truncated-info">Information: <%= product.information %></p>
                   <p class="card-text">Like: <%= product.like %></p>
                   <div class="row">
                     <div class="col-6">
@@ -251,9 +251,43 @@
             <% if ((index + 1) % 4 === 0) { %>
               </div><div class="w-100"></div><div class="row justify-content-start">
             <% } %>
-          <% }); %> 
+          <% }); %>
         </div>
       </div>
+    
+      <% if (totalPages > 1) { %>
+        <div class="container">
+          <div class="row justify-content-center">
+            <nav aria-label="Product Pagination">
+              <ul class="pagination">
+                <% if (currentPage > 1) { %>
+                  <li class="page-item">
+                    <a class="page-link" href="/product?page=<%= currentPage - 1 %>" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                      <span class="sr-only">Previous</span>
+                    </a>
+                  </li>
+                <% } %>
+    
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                  <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                    <a class="page-link" href="/product?page=<%= i %>"><%= i %></a>
+                  </li>
+                <% } %>
+    
+                <% if (currentPage < totalPages) { %>
+                  <li class="page-item">
+                    <a class="page-link" href="/product?page=<%= currentPage + 1 %>" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                      <span class="sr-only">Next</span>
+                    </a>
+                  </li>
+                <% } %>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      <% } %>
     </body>
     <footer>
       <div class="container">
