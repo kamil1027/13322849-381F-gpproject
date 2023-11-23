@@ -96,8 +96,7 @@ In the home page, each user can log out their account by clicking Sign out.
 It would clear the session (req.session.username) to null
 
 ********************************************
-# CRUD service
-- Create
+# Create
 In the shop, there are three create flow which are
 - create-order-flow
 - Signup flow
@@ -193,7 +192,7 @@ Create order {
 Should see the comment data
 
 ********************************************
-# CRUD service
+# Read
 
 **Product page**
 Product page has two page which read data from Mongodb with following data
@@ -265,7 +264,7 @@ else{
 - Show the below data in profile page
 
 ********************************************
-# CRUD service
+# Update
 
 **Profile Page**
 1. Login
@@ -283,7 +282,7 @@ update profile flow
 -->Update all data unless icon from the user collection of mongodb base on username (req.session.username)
 
 ********************************************
-# CRUD service
+# Delete
 Two delete flow would use in two pages which are
 - Profile page
 - Product-Info page
