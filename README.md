@@ -4,7 +4,10 @@ Group: 86
 Name: 
 Hung Kam Fung (13322849)
 
+Github link: https://github.com/kamil1027/13322849-381F-gpproject
 Application link: https://three81f-gp.onrender.com
+
+Better use github for reading read.me
 
 ********************************************
 # Mongo collection
